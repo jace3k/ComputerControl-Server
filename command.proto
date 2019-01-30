@@ -1,0 +1,129 @@
+syntax = "proto3";
+
+option java_package = "pl.jacekpiszczek.androidapp";
+option java_multiple_files = true;
+
+message Command {
+    string param = 1;
+}
+
+message Empty {}
+
+message File {
+    bytes content = 1;
+}
+
+message StaticInfo {
+    string cpuName = 1;
+    int32 coreCount = 2;
+    int32 coreCountLogical = 3;
+    float minFreq = 4;
+    float maxFreq = 5;
+
+    string system = 6;
+    string release = 7;
+    string version = 8;
+    string architecture = 9;
+
+    float uptime = 11;
+}
+
+message FastIntervalInfo {
+    float usagePercent = 1;
+    float currentFreq = 2;
+}
+
+message SlowIntervalInfo {
+    int64 totalMemory = 10;
+    int64 availableMemory = 1;
+    float percentMemory = 2;
+    int64 usedMemory = 3;
+    int64 freeMemory = 4;
+
+    float percentBattery = 5;
+    bool powerPlugged = 6;
+    sint64 secondsLeftBattery = 7;
+}
+
+message DiskInfo {
+    repeated Disk disks = 1;
+}
+
+message Disk {
+    string mountpoint = 1;
+    string fstype = 2;
+    int64 totalMemory = 3;
+    int64 usedMemory = 4;
+    int64 freeMemory = 5;
+    float percentMemory = 6;
+}
+
+message ShutdownParams {
+    int32 delay = 1;
+    bool restart = 2;
+    bool cancel = 3;
+}
+
+message Level {
+    int32 value = 1;
+}
+
+message Alert {
+    string text = 1;
+    string title = 2;
+    bool isNotification = 3;
+}
+
+message Elements {
+    string currentPath = 1;
+    repeated Element elementsInPath = 2;
+}
+
+message Element {
+    string name = 1;
+    string type = 2;
+}
+
+message Success {
+    bool success = 1;
+}
+
+message Welcome {
+    string system = 1;
+    string user = 2;
+}
+
+service Commander {
+    // Auth
+    rpc LogIn (Command) returns (Success) {}
+
+    // Info
+    rpc GetStaticInfo(Empty) returns (StaticInfo) {}
+    rpc GetFastIntervalInfo(Empty) returns (FastIntervalInfo) {}
+    rpc GetSlowIntervalInfo(Empty) returns (SlowIntervalInfo) {}
+    rpc GetShortInfo (Empty) returns (Welcome) {}
+    rpc GetDiskInfo (Empty) returns (DiskInfo) {}
+
+    // Regulation
+    rpc SetVolume (Success) returns (Success) {}
+    rpc SetBrightness (Level) returns (Command) {}
+
+    // ON OFF
+    rpc Shutdown (ShutdownParams) returns (Command) {}
+
+    // File manager
+    rpc GetElementsInPath(Command) returns (Elements) {}
+    rpc OpenFile(Command) returns (File) {}
+    rpc DeleteFile(Command) returns (Command) {}
+    rpc CreateNewFolder(Command) returns (Command) {}
+    rpc SetBackground(Command) returns (Command) {}
+
+    // Additional
+    rpc OpenCDROM (Empty) returns (Command) {}
+    rpc OpenInternetBrowser (Command) returns (Command) {}
+    rpc Screenshot (Empty) returns (File) {}
+    rpc GetKeyLogs (Empty) returns (Command) {}
+    rpc OpenInfoWindow (Alert) returns (Command) {}
+    rpc Say (Command) returns (Command) {}
+    rpc Click (Command) returns (Command) {}
+}
